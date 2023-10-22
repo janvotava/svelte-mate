@@ -2,13 +2,28 @@
   import { Chess as ChessJs, SQUARES } from "chess.js"
   import { onMount } from "svelte"
   import { Chessground } from "svelte-chessground"
+  import type { Key } from "chessground/types"
 
-  onMount(async function () {
+  let stockFish: Worker
+
+  let onBestMove = (_from: string, _to: string) => {}
+
+  void onMount(async function () {
     const { default: StockFish } = await import("stockfish/src/stockfish-nnue-16?worker")
-    const stockFish = new StockFish()
+    stockFish = new StockFish()
+    stockFish.postMessage("setoption name Skill Level value 0")
 
-    stockFish.onmessage = (event) => console.log(event.data)
-    stockFish.postMessage("go depth 15")
+    stockFish.onmessage = function onStockFishMessage(event: MessageEvent<string>) {
+      const { data } = event
+      const [command, ...rest] = data.split(" ")
+      console.log(data)
+
+      if (command === "bestmove") {
+        const [move] = rest
+        const [from, to] = [move.slice(0, 2), move.slice(2, 4)]
+        onBestMove(from, to)
+      }
+    }
   })
 
   let chessground: Chessground
@@ -27,17 +42,40 @@
     return dests
   }
 
-  function playOtherSide(chessground: Chessground, chess: ChessJs) {
-    return (from: string, to: string) => {
+  function syncToChessground(chessground: Chessground, chess: ChessJs) {
+    const color = chess.turn() == "w" ? "white" : "black"
+    chessground.set({
+      turnColor: color,
+      movable: {
+        color,
+        dests: toDests(chess),
+      },
+    })
+  }
+
+  function playComputer(chessground: Chessground, chess: ChessJs) {
+    chessground.set({ viewOnly: true })
+
+    onBestMove = function onBestMove(from: string, to: string) {
       chess.move({ from: from, to: to })
-      const color = chess.turn() == "w" ? "white" : "black"
-      chessground.set({
-        turnColor: color,
-        movable: {
-          color: color,
-          dests: toDests(chess),
-        },
-      })
+      chessground.move(from as Key, to as Key)
+      syncToChessground(chessground, chess)
+      chessground.set({ viewOnly: false })
+    }
+
+    const fen = chess.fen()
+    stockFish.postMessage(`position fen ${fen}`)
+    stockFish.postMessage("go depth 1 movetime 50")
+  }
+
+  function onMoveFnGenerator(chessground: Chessground, chess: ChessJs) {
+    return function onMove(from: string, to: string) {
+      chess.move({ from: from, to: to })
+      syncToChessground(chessground, chess)
+
+      if (chess.turn() === "b") {
+        playComputer(chessground, chess)
+      }
     }
   }
 
@@ -52,7 +90,7 @@
 
   function start() {
     chessground.set({
-      movable: { events: { after: playOtherSide(chessground, chess) } },
+      movable: { events: { after: onMoveFnGenerator(chessground, chess) } },
     })
   }
 
