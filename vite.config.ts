@@ -1,5 +1,6 @@
 import { sveltekit } from "@sveltejs/kit/vite"
 import { defineConfig } from "vitest/config"
+import { viteStaticCopy } from "vite-plugin-static-copy"
 import type { Plugin } from "vite"
 
 const viteServerConfig: Plugin = {
@@ -16,7 +17,18 @@ const viteServerConfig: Plugin = {
 }
 
 export default defineConfig({
-  plugins: [sveltekit(), viteServerConfig],
+  plugins: [
+    sveltekit(),
+    viteServerConfig,
+    viteStaticCopy({
+      targets: [
+        {
+          src: "./node_modules/stockfish/src/stockfish-nnue-16.wasm",
+          dest: "./_app/immutable/workers",
+        },
+      ],
+    }),
+  ],
   test: {
     include: ["src/**/*.{test,spec}.{js,ts}"],
   },
