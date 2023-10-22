@@ -3,6 +3,14 @@
   import { onMount } from "svelte"
   import { Chessground } from "svelte-chessground"
 
+  onMount(async function () {
+    const { default: StockFish } = await import("stockfish/src/stockfish-nnue-16?worker")
+    const stockFish = new StockFish()
+
+    stockFish.onmessage = (event) => console.log(event.data)
+    stockFish.postMessage("go depth 15")
+  })
+
   let chessground: Chessground
 
   // Find all legal moves
