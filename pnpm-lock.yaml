@@ -23,6 +23,9 @@ devDependencies:
   autoprefixer:
     specifier: ^10.4.16
     version: 10.4.16(postcss@8.4.31)
+  chess.js:
+    specifier: 1.0.0-beta.6
+    version: 1.0.0-beta.6
   eslint:
     specifier: ^8.28.0
     version: 8.52.0
@@ -886,6 +889,10 @@ packages:
     resolution: {integrity: sha512-iKEoDYaRmd1mxM90a2OEfWhjsjPpYPuQ+lMYsoxB126+t8fw7ySEO48nmDg5COTjxDI65/Y2OWpeEHk3ZOe8zg==}
     dependencies:
       get-func-name: 2.0.2
+    dev: true
+
+  /chess.js@1.0.0-beta.6:
+    resolution: {integrity: sha512-sqBfX1VL3csSyqVM5ogbKA+aRlZyWDh276ruWXphwI0lDUMs7iYjZs29BOi49f7mXeunJE7cdfnIZhihsyLnsA==}
     dev: true
 
   /chessground@8.4.0:
