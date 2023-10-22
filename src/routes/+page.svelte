@@ -100,9 +100,12 @@
     }
   }
 
+  let isReady = true
+
   function playComputer(chessground: Chessground, chess: ChessJs) {
-    chessground.set({ viewOnly: true })
+    isReady = false
     const fen = chess.fen()
+    console.log(`position fen ${fen}`)
     stockfish.postMessage(`position fen ${fen}`)
 
     stop()
@@ -110,8 +113,9 @@
       chess.move({ from: from, to: to })
       chessground.move(from as Key, to as Key)
       syncToChessground(chessground, chess)
-      chessground.set({ viewOnly: false })
       calculateScore(chess)
+
+      isReady = true
     }
 
     stockfish.postMessage("go depth 1 movetime 50")
@@ -152,12 +156,35 @@
     },
   } as const
 
-  function start() {
+  async function start() {
+    // WORKAROUND: Chessground is unhappy when initialized with `viewOnly` set to false.
+    isReady = false
+
     chessground.set({
       movable: { events: { after: onMoveFnGenerator(chessground, chess) } },
     })
 
-    loadStockfish()
+    await loadStockfish()
+    await tick()
+
+    isReady = true
+  }
+
+  function undo(chessground: Chessground, chess: ChessJs) {
+    stop()
+
+    function undo() {
+      const move = chess.undo()
+      if (move) {
+        chessground.move(move.to, move.from)
+        syncToChessground(chessground, chess)
+      }
+    }
+
+    undo()
+    undo()
+
+    calculateScore(chess)
   }
 
   onMount(start)
@@ -165,7 +192,8 @@
 
 <div class="w-full h-screen flex justify-center items-center">
   <div class="max-w-2xl flex-1 flex">
-    <Chessground bind:this={chessground} {config} />
+    <Chessground bind:this={chessground} {config} viewOnly={!isReady} />
+
     <div
       class="flex flex-col flex-nowrap justify-end w-10 bg-gray-900 overflow-hidden dark:bg-gray-700"
     >
@@ -177,6 +205,12 @@
         aria-valuemin={0}
         aria-valuemax={100}
       />
+    </div>
+
+    <div class="ml-5 shadow-md p-5">
+      <button type="button" on:click={() => undo(chessground, chess)} disabled={!isReady}
+        >Undo</button
+      >
     </div>
   </div>
 </div>
