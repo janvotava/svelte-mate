@@ -7,6 +7,7 @@
   let stockfish: Worker
 
   let onBestMove = (_from: string, _to: string) => {}
+  let onInfo = (_centiPawns: number) => {}
 
   async function loadStockfish() {
     const { default: Stockfish } = await import("stockfish/src/stockfish-nnue-16?worker")
@@ -21,6 +22,16 @@
         const [move] = rest
         const [from, to] = [move.slice(0, 2), move.slice(2, 4)]
         onBestMove(from, to)
+      } else if (command === "info") {
+        const data = rest.join(" ")
+
+        const cpRegex = /score cp (-?\d+)/
+        const match = data.match(cpRegex)
+
+        if (match && match[1]) {
+          const cpValue = parseInt(match[1], 10)
+          onInfo(cpValue)
+        }
       } else if (command === "uciok") {
         stockfish.postMessage("setoption name Skill Level value 0")
         stockfish.postMessage("setoption name Threads value 4")
@@ -33,6 +44,7 @@
 
   function stop() {
     onBestMove = () => {}
+    onInfo = () => {}
     stockfish.postMessage("stop")
   }
 
@@ -81,6 +93,7 @@
     })
 
     if (chess.isGameOver()) {
+      stop()
       await tick()
 
       alert("GAME OVER! - " + gameOverReason(chess))
@@ -98,9 +111,25 @@
       chessground.move(from as Key, to as Key)
       syncToChessground(chessground, chess)
       chessground.set({ viewOnly: false })
+      calculateScore(chess)
     }
 
     stockfish.postMessage("go depth 1 movetime 50")
+  }
+
+  let whiteWinProbability = 50
+
+  function calculateScore(chess: ChessJs) {
+    stop()
+
+    const fen = chess.fen()
+    stockfish.postMessage(`position fen ${fen}`)
+
+    onInfo = (centiPawns) => {
+      whiteWinProbability = 50 + 50 * (2 / (1 + Math.exp(-0.004 * centiPawns)) - 1)
+    }
+
+    stockfish.postMessage("go depth 20 movetime 2000")
   }
 
   function onMoveFnGenerator(chessground: Chessground, chess: ChessJs) {
@@ -135,7 +164,19 @@
 </script>
 
 <div class="w-full h-screen flex justify-center items-center">
-  <div class="max-w-2xl flex-1">
+  <div class="max-w-2xl flex-1 flex">
     <Chessground bind:this={chessground} {config} />
+    <div
+      class="flex flex-col flex-nowrap justify-end w-10 bg-gray-900 overflow-hidden dark:bg-gray-700"
+    >
+      <div
+        class="bg-gray-100 overflow-hidden"
+        role="progressbar"
+        style="height: {whiteWinProbability}%"
+        aria-valuenow={whiteWinProbability}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      />
+    </div>
   </div>
 </div>
