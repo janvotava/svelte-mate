@@ -175,10 +175,12 @@
 
     function undo() {
       const move = chess.undo()
-      if (move) {
-        chessground.move(move.to, move.from)
-        syncToChessground(chessground, chess)
+      if (!move) {
+        return
       }
+
+      chessground.move(move.to, move.from)
+      syncToChessground(chessground, chess)
     }
 
     undo()
