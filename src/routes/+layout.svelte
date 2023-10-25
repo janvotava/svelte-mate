@@ -2,4 +2,6 @@
   import "../app.css"
 </script>
 
-<slot />
+<div class="bg-stone-800 flex w-full h-full">
+  <slot />
+</div>

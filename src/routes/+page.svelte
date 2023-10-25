@@ -191,14 +191,14 @@
 </script>
 
 <div class="w-full h-screen flex justify-center items-center">
-  <div class="max-w-2xl flex-1 flex">
+  <div class="max-w-3xl flex-1 flex">
     <Chessground bind:this={chessground} {config} viewOnly={!isReady} />
 
     <div
-      class="flex flex-col flex-nowrap justify-end w-10 bg-gray-900 overflow-hidden dark:bg-gray-700"
+      class="flex flex-col flex-nowrap justify-end w-5 bg-zinc-900 overflow-hidden dark:bg-zinc-700"
     >
       <div
-        class="bg-gray-100 overflow-hidden"
+        class="bg-zinc-100 overflow-hidden"
         role="progressbar"
         style="height: {whiteWinProbability}%"
         aria-valuenow={whiteWinProbability}
@@ -207,8 +207,12 @@
       />
     </div>
 
-    <div class="ml-5 shadow-md p-5">
-      <button type="button" on:click={() => undo(chessground, chess)} disabled={!isReady}
+    <div class="ml-5">
+      <button
+        type="button"
+        on:click={() => undo(chessground, chess)}
+        disabled={!isReady}
+        class="bg-zinc-700 px-7 py-3 rounded-lg text-zinc-200 font-semibold text-lg hover:bg-zinc-600"
         >Undo</button
       >
     </div>
