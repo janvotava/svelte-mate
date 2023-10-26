@@ -30,6 +30,10 @@
 
       if (command === "bestmove") {
         const [move] = rest
+        if (move === "(none)") {
+          return
+        }
+
         const [from, to] = [move.slice(0, 2), move.slice(2, 4)]
         onBestMove(from, to)
       } else if (command === "info") {
