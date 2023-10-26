@@ -176,10 +176,11 @@
         const fen = decodeURIComponent(hash.substring(1))
         chess.load(fen)
         chessground.set({ fen })
-        syncToChessground(chessground, chess)
       } catch (err) {
         console.error("Position load failed", err)
       }
+
+      syncToChessground(chessground, chess)
     }
 
     chessground.set({
