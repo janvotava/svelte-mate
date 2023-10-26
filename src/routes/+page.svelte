@@ -191,19 +191,13 @@
   function undo(chessground: Chessground, chess: ChessJs) {
     stop()
 
-    function undo() {
-      const move = chess.undo()
-      if (!move) {
-        return
-      }
+    chess.undo()
+    chess.undo()
 
-      chessground.move(move.to, move.from)
-      syncToChessground(chessground, chess)
-    }
-
-    undo()
-    undo()
-
+    chessground.set({
+      fen: chess.fen(),
+    })
+    syncToChessground(chessground, chess)
     calculateScore(chess)
   }
 
