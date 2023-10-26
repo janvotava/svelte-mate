@@ -179,8 +179,6 @@
       } catch (err) {
         console.error("Position load failed", err)
       }
-
-      syncToChessground(chessground, chess)
     }
 
     chessground.set({
@@ -189,6 +187,8 @@
 
     await loadStockfish()
     await tick()
+
+    syncToChessground(chessground, chess)
 
     isReady = true
   }
