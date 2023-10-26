@@ -117,11 +117,6 @@
       forceChessJsAndChessgroundPositionSync()
     }
 
-    const fen = chess.fen()
-    goto(`/#${encodeURIComponent(fen)}`, {
-      replaceState: true,
-    })
-
     if (chess.isGameOver()) {
       stop()
       await tick()
@@ -265,6 +260,13 @@
     calculateScore(chess)
   }
 
+  function copyFenToClipboard(chess: ChessJs) {
+    const { url } = $page
+    const fen = chess.fen()
+
+    navigator.clipboard.writeText(`${url.protocol}://${url.host}/#${encodeURIComponent(fen)}`)
+  }
+
   onMount(start)
 </script>
 
@@ -295,13 +297,21 @@
     {/if}
   </div>
 
-  <div>
+  <div class="flex items-start space-x-2">
     <button
       type="button"
       on:click={() => undo(chessground, chess)}
       disabled={!isReady}
       class="bg-zinc-700 px-7 py-3 rounded-lg text-zinc-200 font-semibold text-lg hover:bg-zinc-600"
       >Undo</button
+    >
+
+    <button
+      type="button"
+      on:click={() => copyFenToClipboard(chess)}
+      disabled={!isReady}
+      class="bg-zinc-700 px-7 py-3 rounded-lg text-zinc-200 font-semibold text-lg hover:bg-zinc-600"
+      >Save to clipboard</button
     >
   </div>
 
