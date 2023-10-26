@@ -215,10 +215,11 @@
     afterMove(chessground, chess)
   }
 
-  onMount(() => loadStockfish())
-  onMount(() => {
+  onMount(async () => {
     // WORKAROUND: Chessground is unhappy when initialized with `viewOnly` set to false.
     isReady = false
+
+    await loadStockfish()
   })
 
   async function start(chessground: Chessground, chess: ChessJs) {
