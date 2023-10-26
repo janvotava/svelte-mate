@@ -1,19 +1,12 @@
 <script lang="ts">
-  import {
-    Chess as ChessJs,
-    SQUARES,
-    type Color,
-    type Square,
-    type PieceSymbol,
-    type Move,
-  } from "chess.js"
+  import { Chess as ChessJs, SQUARES, type Color, type Square, type PieceSymbol } from "chess.js"
   import { onMount, tick } from "svelte"
   import { Chessground } from "svelte-chessground"
   import type { Key } from "chessground/types"
   import { page } from "$app/stores"
-  import { goto } from "$app/navigation"
   import PromotionDialog from "$lib/components/PromotionDialog.svelte"
 
+  export let data
   let stockfish: Worker
 
   let onBestMove = (_from: string, _to: string) => {}
@@ -200,7 +193,7 @@
     }
   }
 
-  const chess = new ChessJs()
+  const chess = new ChessJs(data.fen)
   const config = {
     movable: {
       color: "white",
@@ -224,17 +217,6 @@
   async function start() {
     // WORKAROUND: Chessground is unhappy when initialized with `viewOnly` set to false.
     isReady = false
-
-    const { hash } = $page.url
-
-    if (hash) {
-      try {
-        const fen = decodeURIComponent(hash.substring(1))
-        chess.load(fen)
-      } catch (err) {
-        console.error("Position load failed", err)
-      }
-    }
 
     chessground.set({
       movable: { events: { after: onMoveFnGenerator(chessground, chess) } },
@@ -265,7 +247,7 @@
     const { url } = $page
     const fen = chess.fen()
 
-    navigator.clipboard.writeText(`${url.protocol}://${url.host}/#${encodeURIComponent(fen)}`)
+    navigator.clipboard.writeText(`${url.protocol}://${url.host}/${encodeURIComponent(fen)}`)
   }
 
   onMount(start)
