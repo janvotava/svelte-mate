@@ -209,31 +209,33 @@
   onMount(start)
 </script>
 
-<div class="w-full h-full flex justify-center items-center">
-  <div class="max-w-3xl flex-1 flex">
+<div class="grid gap-1 grid-cols-[1fr_20px_minmax(100px,calc(100vh-2.5rem))_200px_1fr] p-5">
+  <div />
+
+  <div class="bg-zinc-900 overflow-hidden dark:bg-zinc-700">
     <div
-      class="flex flex-col flex-nowrap justify-end w-5 bg-zinc-900 overflow-hidden dark:bg-zinc-700"
-    >
-      <div
-        class="bg-zinc-100 overflow-hidden"
-        role="progressbar"
-        style="height: {whiteWinProbability}%"
-        aria-valuenow={whiteWinProbability}
-        aria-valuemin={0}
-        aria-valuemax={100}
-      />
-    </div>
-
-    <Chessground bind:this={chessground} {config} viewOnly={!isReady} />
-
-    <div class="ml-5">
-      <button
-        type="button"
-        on:click={() => undo(chessground, chess)}
-        disabled={!isReady}
-        class="bg-zinc-700 px-7 py-3 rounded-lg text-zinc-200 font-semibold text-lg hover:bg-zinc-600"
-        >Undo</button
-      >
-    </div>
+      class="bg-zinc-100 overflow-hidden"
+      role="progressbar"
+      style="height: {whiteWinProbability}%"
+      aria-valuenow={whiteWinProbability}
+      aria-valuemin={0}
+      aria-valuemax={100}
+    />
   </div>
+
+  <div>
+    <Chessground bind:this={chessground} {config} viewOnly={!isReady} />
+  </div>
+
+  <div>
+    <button
+      type="button"
+      on:click={() => undo(chessground, chess)}
+      disabled={!isReady}
+      class="bg-zinc-700 px-7 py-3 rounded-lg text-zinc-200 font-semibold text-lg hover:bg-zinc-600"
+      >Undo</button
+    >
+  </div>
+
+  <div />
 </div>

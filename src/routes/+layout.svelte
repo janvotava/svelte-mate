@@ -2,6 +2,10 @@
   import "../app.css"
 </script>
 
-<div class="bg-stone-800 flex w-full h-full">
+<svelte:head>
+  <title>Chess</title>
+</svelte:head>
+
+<div class="bg-stone-800 h-full">
   <slot />
 </div>
