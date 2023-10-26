@@ -3,6 +3,8 @@
   import { onMount, tick } from "svelte"
   import { Chessground } from "svelte-chessground"
   import type { Key } from "chessground/types"
+  import { page } from "$app/stores"
+  import { goto } from "$app/navigation"
 
   let stockfish: Worker
 
@@ -92,6 +94,9 @@
       check: chess.isCheck(),
     })
 
+    const fen = chess.fen()
+    goto(`/#${encodeURIComponent(fen)}`)
+
     if (chess.isGameOver()) {
       stop()
       await tick()
@@ -159,6 +164,19 @@
   async function start() {
     // WORKAROUND: Chessground is unhappy when initialized with `viewOnly` set to false.
     isReady = false
+
+    const { hash } = $page.url
+
+    if (hash) {
+      try {
+        const fen = decodeURIComponent(hash.substring(1))
+        chess.load(fen)
+        chessground.set({ fen })
+        syncToChessground(chessground, chess)
+      } catch (err) {
+        console.error("Position load failed", err)
+      }
+    }
 
     chessground.set({
       movable: { events: { after: onMoveFnGenerator(chessground, chess) } },
