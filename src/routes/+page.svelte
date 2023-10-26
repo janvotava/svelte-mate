@@ -95,7 +95,9 @@
     })
 
     const fen = chess.fen()
-    goto(`/#${encodeURIComponent(fen)}`)
+    goto(`/#${encodeURIComponent(fen)}`, {
+      replaceState: true,
+    })
 
     if (chess.isGameOver()) {
       stop()
