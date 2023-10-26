@@ -211,8 +211,6 @@
 
 <div class="w-full h-screen flex justify-center items-center">
   <div class="max-w-3xl flex-1 flex">
-    <Chessground bind:this={chessground} {config} viewOnly={!isReady} />
-
     <div
       class="flex flex-col flex-nowrap justify-end w-5 bg-zinc-900 overflow-hidden dark:bg-zinc-700"
     >
@@ -225,6 +223,8 @@
         aria-valuemax={100}
       />
     </div>
+
+    <Chessground bind:this={chessground} {config} viewOnly={!isReady} />
 
     <div class="ml-5">
       <button
