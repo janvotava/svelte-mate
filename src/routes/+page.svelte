@@ -268,14 +268,16 @@
   onMount(start)
 </script>
 
-<div class="grid gap-1 grid-cols-[1fr_20px_minmax(100px,calc(100vh-2.5rem))_200px_1fr] p-5">
+<div
+  class="grid gap-1 grid-rows-[0_20px_minmax(100px,calc(100vw-2.5rem))_200px_1fr] md:grid-rows-1 md:grid-cols-[1fr_20px_minmax(100px,calc(100vh-2.5rem))_200px_1fr] p-5"
+>
   <div />
 
   <div class="bg-zinc-900 overflow-hidden dark:bg-zinc-700">
     <div
-      class="bg-zinc-100 overflow-hidden"
+      class="bg-zinc-100 overflow-hidden md:min-w-full max-md:min-h-full"
       role="progressbar"
-      style="height: {whiteWinProbability}%"
+      style="height:{whiteWinProbability}%;width:{whiteWinProbability}%"
       aria-valuenow={whiteWinProbability}
       aria-valuemin={0}
       aria-valuemax={100}
