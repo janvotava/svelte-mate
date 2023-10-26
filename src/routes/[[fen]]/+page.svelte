@@ -7,7 +7,7 @@
   import PromotionDialog from "$lib/components/PromotionDialog.svelte"
 
   export let data
-  let stockfish: Worker
+  let stockfish: Worker | undefined
 
   let onBestMove = (_from: string, _to: string) => {}
   let onInfo = (_centiPawns: number) => {}
@@ -40,10 +40,11 @@
           onInfo(cpValue)
         }
       } else if (command === "uciok") {
-        stockfish.postMessage("setoption name Skill Level value 0")
-        stockfish.postMessage("setoption name Threads value 4")
-        stockfish.postMessage("setoption name Hash value 256")
+        this.postMessage("setoption name Skill Level value 0")
+        this.postMessage("setoption name Threads value 4")
+        this.postMessage("setoption name Hash value 256")
 
+        isReady = true
         calculateScore(chess)
       }
     }
@@ -54,7 +55,7 @@
   function stop() {
     onBestMove = () => {}
     onInfo = () => {}
-    stockfish.postMessage("stop")
+    stockfish?.postMessage("stop")
   }
 
   let chessground: Chessground
@@ -125,7 +126,7 @@
     isReady = false
     const fen = chess.fen()
     console.log(`position fen ${fen}`)
-    stockfish.postMessage(`position fen ${fen}`)
+    stockfish?.postMessage(`position fen ${fen}`)
 
     stop()
     onBestMove = function onBestMove(from: string, to: string) {
@@ -137,7 +138,7 @@
       isReady = true
     }
 
-    stockfish.postMessage("go depth 1 movetime 50")
+    stockfish?.postMessage("go depth 1 movetime 50")
   }
 
   let whiteWinProbability = 50
@@ -146,13 +147,13 @@
     stop()
 
     const fen = chess.fen()
-    stockfish.postMessage(`position fen ${fen}`)
+    stockfish?.postMessage(`position fen ${fen}`)
 
     onInfo = (centiPawns) => {
       whiteWinProbability = 50 + 50 * (2 / (1 + Math.exp(-0.004 * centiPawns)) - 1)
     }
 
-    stockfish.postMessage("go depth 20 movetime 2000")
+    stockfish?.postMessage("go depth 20 movetime 2000")
   }
 
   type PromotionQuestion = {
@@ -193,8 +194,8 @@
     }
   }
 
-  const chess = new ChessJs(data.fen)
-  const config = {
+  $: chess = new ChessJs(data.fen)
+  $: config = {
     movable: {
       color: "white",
       free: false,
@@ -214,20 +215,20 @@
     afterMove(chessground, chess)
   }
 
-  async function start() {
+  onMount(() => loadStockfish())
+  onMount(() => {
     // WORKAROUND: Chessground is unhappy when initialized with `viewOnly` set to false.
     isReady = false
+  })
+
+  async function start(chessground: Chessground, chess: ChessJs) {
+    stop()
 
     chessground.set({
       movable: { events: { after: onMoveFnGenerator(chessground, chess) } },
     })
 
-    await loadStockfish()
-    await tick()
-
     syncToChessground(chessground, chess)
-
-    isReady = true
   }
 
   function undo(chessground: Chessground, chess: ChessJs) {
@@ -250,7 +251,7 @@
     navigator.clipboard.writeText(`${url.protocol}://${url.host}/${encodeURIComponent(fen)}`)
   }
 
-  onMount(start)
+  $: chessground && chess && start(chessground, chess)
 </script>
 
 <div
