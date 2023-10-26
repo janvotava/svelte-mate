@@ -237,9 +237,6 @@
     chess.undo()
     chess.undo()
 
-    chessground.set({
-      fen: chess.fen(),
-    })
     syncToChessground(chessground, chess)
     calculateScore(chess)
   }
