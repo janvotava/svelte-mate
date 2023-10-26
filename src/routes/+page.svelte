@@ -38,6 +38,8 @@
         stockfish.postMessage("setoption name Skill Level value 0")
         stockfish.postMessage("setoption name Threads value 4")
         stockfish.postMessage("setoption name Hash value 256")
+
+        calculateScore(chess)
       }
     }
 
