@@ -209,7 +209,7 @@
   onMount(start)
 </script>
 
-<div class="w-full h-screen flex justify-center items-center">
+<div class="w-full h-full flex justify-center items-center">
   <div class="max-w-3xl flex-1 flex">
     <div
       class="flex flex-col flex-nowrap justify-end w-5 bg-zinc-900 overflow-hidden dark:bg-zinc-700"
