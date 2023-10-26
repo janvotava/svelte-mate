@@ -1,10 +1,18 @@
 <script lang="ts">
-  import { Chess as ChessJs, SQUARES } from "chess.js"
+  import {
+    Chess as ChessJs,
+    SQUARES,
+    type Color,
+    type Square,
+    type PieceSymbol,
+    type Move,
+  } from "chess.js"
   import { onMount, tick } from "svelte"
   import { Chessground } from "svelte-chessground"
   import type { Key } from "chessground/types"
   import { page } from "$app/stores"
   import { goto } from "$app/navigation"
+  import PromotionDialog from "$lib/components/PromotionDialog.svelte"
 
   let stockfish: Worker
 
@@ -84,6 +92,10 @@
     throw new Error("Game is not over")
   }
 
+  function forceChessJsAndChessgroundPositionSync() {
+    chessground.set({ fen: chess.fen() })
+  }
+
   async function syncToChessground(chessground: Chessground, chess: ChessJs) {
     const color = chess.turn() == "w" ? "white" : "black"
 
@@ -95,6 +107,11 @@
       },
       check: chess.isCheck(),
     })
+
+    const isPositionSynced = chessground.getFen() === chess.fen().split(" ")[0]
+    if (!isPositionSynced) {
+      forceChessJsAndChessgroundPositionSync()
+    }
 
     const fen = chess.fen()
     goto(`/#${encodeURIComponent(fen)}`, {
@@ -145,14 +162,41 @@
     stockfish.postMessage("go depth 20 movetime 2000")
   }
 
+  type PromotionQuestion = {
+    from: Square
+    to: Square
+    color: Color
+  }
+
+  let promotionQuestion: PromotionQuestion | undefined = undefined
+
   function onMoveFnGenerator(chessground: Chessground, chess: ChessJs) {
     return function onMove(from: string, to: string) {
-      chess.move({ from: from, to: to })
-      syncToChessground(chessground, chess)
+      const isPromotion =
+        chess
+          .moves({ verbose: true })
+          .filter((move) => move.from === from && move.to === to && move.flags.includes("p"))
+          .length > 0
 
-      if (chess.turn() === "b") {
-        playComputer(chessground, chess)
+      if (isPromotion) {
+        isReady = false
+        promotionQuestion = {
+          from: from as Square,
+          to: to as Square,
+          color: chess.turn(),
+        }
+      } else {
+        chess.move({ to, from })
+        afterMove(chessground, chess)
       }
+    }
+  }
+
+  function afterMove(chessground: Chessground, chess: ChessJs) {
+    syncToChessground(chessground, chess)
+
+    if (chess.turn() === "b") {
+      playComputer(chessground, chess)
     }
   }
 
@@ -165,6 +209,18 @@
     },
   } as const
 
+  function promote(chessground: Chessground, chess: ChessJs, piece: PieceSymbol) {
+    if (!promotionQuestion) {
+      throw new Error("Promotion question not set")
+    }
+
+    const { to, from } = promotionQuestion
+    chess.move({ to, from, promotion: piece })
+    promotionQuestion = undefined
+    isReady = true
+    afterMove(chessground, chess)
+  }
+
   async function start() {
     // WORKAROUND: Chessground is unhappy when initialized with `viewOnly` set to false.
     isReady = false
@@ -175,7 +231,6 @@
       try {
         const fen = decodeURIComponent(hash.substring(1))
         chess.load(fen)
-        chessground.set({ fen })
       } catch (err) {
         console.error("Position load failed", err)
       }
@@ -223,8 +278,15 @@
     />
   </div>
 
-  <div>
+  <div class="relative">
     <Chessground bind:this={chessground} {config} viewOnly={!isReady} />
+    {#if promotionQuestion}
+      <PromotionDialog
+        square={promotionQuestion.to}
+        orientation={promotionQuestion.color}
+        callback={(piece) => promote(chessground, chess, piece)}
+      />
+    {/if}
   </div>
 
   <div>
