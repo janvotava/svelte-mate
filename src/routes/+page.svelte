@@ -118,6 +118,7 @@
     }
 
     if (chess.isGameOver()) {
+      isReady = false
       stop()
       await tick()
 
