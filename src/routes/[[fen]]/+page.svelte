@@ -281,7 +281,14 @@
     {/if}
   </div>
 
-  <div class="flex items-start space-x-2">
+  <div class="flex flex-wrap items-start space-x-2">
+    <a
+      href="/"
+      class="bg-zinc-700 px-7 py-3 rounded-lg text-zinc-200 font-semibold text-lg hover:bg-zinc-600"
+    >
+      New Game
+    </a>
+
     <button
       type="button"
       on:click={() => undo(chessground, chess)}
