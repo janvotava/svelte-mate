@@ -285,6 +285,7 @@
       href="/"
       class="bg-zinc-700 px-5 py-3 rounded-lg text-zinc-200 font-semibold text-2xl hover:bg-zinc-600"
       title="New game"
+      data-sveltekit-reload
     >
       <Icon icon="solar:restart-circle-bold" />
     </a>
