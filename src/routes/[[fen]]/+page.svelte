@@ -5,6 +5,7 @@
   import type { Key } from "chessground/types"
   import { page } from "$app/stores"
   import PromotionDialog from "$lib/components/PromotionDialog.svelte"
+  import Icon from "@iconify/svelte"
 
   export let data
   let stockfish: Worker | undefined
@@ -253,7 +254,7 @@
 </script>
 
 <div
-  class="grid gap-1 grid-rows-[0_20px_minmax(100px,calc(100vw-2.5rem))_200px_1fr] md:grid-rows-1 md:grid-cols-[1fr_20px_minmax(100px,calc(100vh-2.5rem))_200px_1fr] py-5"
+  class="grid gap-1 grid-rows-[0_20px_minmax(100px,calc(100vw))_200px_1fr] md:grid-rows-1 md:grid-cols-[1fr_20px_minmax(100px,calc(100vh-2.5rem))_200px_1fr] py-5"
 >
   <div />
 
@@ -279,28 +280,31 @@
     {/if}
   </div>
 
-  <div class="flex flex-wrap items-start space-x-2">
+  <div class="flex justify-start items-start space-x-2">
     <a
       href="/"
-      class="bg-zinc-700 px-7 py-3 rounded-lg text-zinc-200 font-semibold text-lg hover:bg-zinc-600"
+      class="bg-zinc-700 px-5 py-3 rounded-lg text-zinc-200 font-semibold text-2xl hover:bg-zinc-600"
+      title="New game"
     >
-      New Game
+      <Icon icon="solar:restart-circle-bold" />
     </a>
 
     <button
       type="button"
       on:click={() => undo(chessground, chess)}
       disabled={!isReady}
-      class="bg-zinc-700 px-7 py-3 rounded-lg text-zinc-200 font-semibold text-lg hover:bg-zinc-600"
-      >Undo</button
+      class="bg-zinc-700 px-5 py-3 rounded-lg text-zinc-200 font-semibold text-2xl hover:bg-zinc-600"
     >
+      <Icon icon="icon-park-outline:left" />
+    </button>
 
     <button
       type="button"
       on:click={() => copyFenToClipboard(chess)}
       disabled={!isReady}
-      class="bg-zinc-700 px-7 py-3 rounded-lg text-zinc-200 font-semibold text-lg hover:bg-zinc-600"
-      >Save to clipboard</button
+      class="bg-zinc-700 px-5 py-3 rounded-lg text-zinc-200 font-semibold text-2xl hover:bg-zinc-600"
+    >
+      <Icon icon="solar:copy-bold-duotone" /></button
     >
   </div>
 
