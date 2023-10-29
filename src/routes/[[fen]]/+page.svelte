@@ -258,7 +258,7 @@
 >
   <div />
 
-  <div class="bg-zinc-900 overflow-hidden dark:bg-zinc-700">
+  <div class="bg-zinc-900 overflow-hidden dark:bg-zinc-700 flex items-end">
     <div
       class="bg-zinc-100 overflow-hidden md:min-w-full max-md:min-h-full"
       role="progressbar"
