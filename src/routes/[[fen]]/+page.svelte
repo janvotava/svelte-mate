@@ -253,7 +253,7 @@
 </script>
 
 <div
-  class="grid gap-1 grid-rows-[0_20px_minmax(100px,calc(100vw-2.5rem))_200px_1fr] md:grid-rows-1 md:grid-cols-[1fr_20px_minmax(100px,calc(100vh-2.5rem))_200px_1fr] p-5"
+  class="grid gap-1 grid-rows-[0_20px_minmax(100px,calc(100vw-2.5rem))_200px_1fr] md:grid-rows-1 md:grid-cols-[1fr_20px_minmax(100px,calc(100vh-2.5rem))_200px_1fr] py-5"
 >
   <div />
 
